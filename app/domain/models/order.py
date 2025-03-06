@@ -5,10 +5,12 @@ from sqlalchemy.orm import Mapped, mapped_column
 
 from app.domain.models import Base
 
+
 class OrderStatus(enum.Enum):
     PENDING = "pending"
     CONFIRMED = "confirmed"
     CANCELLED = "cancelled"
+
 
 class Order(Base):
     status: Mapped[OrderStatus] = mapped_column(
