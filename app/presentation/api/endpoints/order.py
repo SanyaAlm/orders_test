@@ -1,3 +1,5 @@
+from typing import List, Optional
+
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -20,7 +22,18 @@ async def get_order_service(
     return OrderService(repository)
 
 
-@router.post("/orders", response_model=OrderResponseDTO)
+@router.get("/all", response_model=List[OrderResponseDTO])
+async def get_orders(
+    status: Optional[str] = None,
+    min_price: Optional[float] = None,
+    max_price: Optional[float] = None,
+    service: OrderService = Depends(get_order_service),
+):
+    orders = await service.get_orders(status, min_price, max_price)
+    return [map_order_to_dto(order) for order in orders]
+
+
+@router.post("/create", response_model=OrderResponseDTO)
 async def create_order(
     order_dto: OrderCreateDTO, service: OrderService = Depends(get_order_service)
 ):
