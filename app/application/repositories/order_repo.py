@@ -25,7 +25,7 @@ class OrderRepository:
         return order
 
     async def get_order_by_id(self, order_id: int) -> Order:
-        result = await self.db.execute(select(Order).where(Order.order_id == order_id))
+        result = await self.db.execute(select(Order).where(Order.id == order.id))
         order = result.scalar_one_or_none()
         return order
 
