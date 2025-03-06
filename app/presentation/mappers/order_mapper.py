@@ -1,6 +1,11 @@
 from app.domain.models import Order, Product
 from app.domain.models.order import OrderStatus
-from app.presentation.schemas.order import OrderResponseDTO, ProductDTO, OrderCreateDTO
+from app.presentation.schemas.order import (
+    OrderResponseDTO,
+    ProductDTO,
+    OrderCreateDTO,
+    OrderUpdateDTO,
+)
 
 
 def map_order_to_dto(order: Order) -> OrderResponseDTO:
@@ -22,6 +27,16 @@ def map_order_create_dto_to_order(dto: OrderCreateDTO) -> Order:
         customer_name=dto.customer_name,
         status=OrderStatus(dto.status),  # Преобразуем строку в Enum
     )
+    for prod in dto.products:
+        product = Product(name=prod.name, price=prod.price, quantity=prod.quantity)
+        order.products.append(product)
+    return order
+
+
+def map_order_update_dto_to_order(order: Order, dto: OrderUpdateDTO) -> Order:
+    order.customer_name = dto.customer_name
+    order.status = OrderStatus(dto.status)
+    order.products.clear()
     for prod in dto.products:
         product = Product(name=prod.name, price=prod.price, quantity=prod.quantity)
         order.products.append(product)

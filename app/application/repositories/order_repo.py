@@ -28,7 +28,7 @@ class OrderRepository:
         result = await self.db.execute(
             select(Order)
             .options(selectinload(Order.products))
-            .where(Order.id == order_id)
+            .where(Order.id == order_id, Order.is_deleted == False)
         )
         order = result.scalar_one_or_none()
         return order
@@ -50,7 +50,11 @@ class OrderRepository:
         min_price: float = None,
         max_price: float = None,
     ):
-        query = select(Order).options(selectinload(Order.products))
+        query = (
+            select(Order)
+            .options(selectinload(Order.products))
+            .where(Order.is_deleted == False)
+        )
         if status:
             query = query.where(Order.status == status)
         if min_price:
