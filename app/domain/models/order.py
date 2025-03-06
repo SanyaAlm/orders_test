@@ -17,7 +17,7 @@ class Order(Base):
         Enum(OrderStatus), default=OrderStatus.PENDING
     )
     total_price: Mapped[int]
-    is_deleted: Mapped[bool] = mapped_column(default=True, nullable=False)
+    is_deleted: Mapped[bool] = mapped_column(default=False, nullable=False)
     customer_name: Mapped[str] = mapped_column(String, nullable=False)
 
     products = relationship(
