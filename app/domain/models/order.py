@@ -1,7 +1,7 @@
 import enum
 
 from sqlalchemy import Enum, String
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.domain.models import Base
 
@@ -19,3 +19,7 @@ class Order(Base):
     total_price: Mapped[int]
     is_deleted: Mapped[bool] = mapped_column(default=True, nullable=False)
     customer_name: Mapped[str] = mapped_column(String, nullable=False)
+
+    products = relationship(
+        "Product", back_populates="order", cascade="all, delete-orphan"
+    )
