@@ -1,6 +1,6 @@
 from typing import List, Optional
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.application.repositories.order_repo import OrderRepository
@@ -31,6 +31,18 @@ async def get_orders(
 ):
     orders = await service.get_orders(status, min_price, max_price)
     return [map_order_to_dto(order) for order in orders]
+
+
+@router.get("/{order_id}", response_model=OrderResponseDTO)
+async def get_order(
+    order_id: int,
+    service: OrderService = Depends(get_order_service),
+):
+    order = await service.get_order_by_id(order_id=order_id)
+    if not order:
+        raise HTTPException(status_code=404, detail="Order not found")
+
+    return map_order_to_dto(order)
 
 
 @router.post("/create", response_model=OrderResponseDTO)
