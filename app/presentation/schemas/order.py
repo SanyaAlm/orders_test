@@ -24,5 +24,5 @@ class OrderResponseDTO(BaseModel):
     order_id: int
     customer_name: str
     status: str
-    total_price: float
+    total_price: int
     products: List[ProductDTO]
