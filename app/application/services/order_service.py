@@ -1,4 +1,4 @@
-from typing import Optional, List
+from typing import Optional, List, Any, Coroutine
 
 from app.application.repositories.order_repo import OrderRepository
 from app.domain.models import Order
@@ -17,7 +17,7 @@ class OrderService:
 
     async def create_order(self, order: Order) -> Order:
         order.total_price = sum(p.price * p.quantity for p in order.products)
-        created_order = await self.repository.create_order(order)
+        created_order = await self.repository.create(order)
         order_data = map_order_to_cache_data(created_order)
         logger.info(f"User {created_order.user_id} created order {created_order.id}")
         await set_order_cache(created_order.id, order_data)
@@ -26,7 +26,7 @@ class OrderService:
 
     async def update_order(self, order: Order) -> Order:
         order.total_price = sum(p.price * p.quantity for p in order.products)
-        updated_order = await self.repository.update_order(order)
+        updated_order = await self.repository.update(order)
         order_data = map_order_to_cache_data(updated_order)
         logger.info(f"User {updated_order.user_id} updated order {updated_order.id}")
         await set_order_cache(updated_order.id, order_data)
@@ -34,7 +34,7 @@ class OrderService:
         return updated_order
 
     async def get_order_by_id(self, order_id: int) -> Optional[Order]:
-        order = await self.repository.get_order_by_id(order_id)
+        order = await self.repository.get_by_id(order_id)
         if order:
             order_data = map_order_to_cache_data(order)
             await set_order_cache(order.id, order_data)
@@ -46,7 +46,7 @@ class OrderService:
         status: Optional[str] = None,
         min_price: Optional[float] = None,
         max_price: Optional[float] = None,
-    ) -> List[Order]:
+    ):
         enum_status = OrderStatus(status) if status else None
         filters = [Order.is_deleted == False]
         if user_id:
@@ -58,11 +58,11 @@ class OrderService:
         if max_price:
             filters.append(Order.total_price <= max_price)
 
-        return await self.repository.get_orders(filters)
+        return await self.repository.get_all(filters)
 
     async def soft_delete_order(self, order: Order) -> Order:
         order.is_deleted = True
-        deleted_order = await self.repository.soft_delete_order(order)
+        deleted_order = await self.repository.delete(order)
         await delete_order_cache(deleted_order.id)
         logger.info(f"User {deleted_order.user_id} deleted order {deleted_order.id}")
 

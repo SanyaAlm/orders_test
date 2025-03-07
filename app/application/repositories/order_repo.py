@@ -2,14 +2,15 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy.orm import selectinload
 
+from app.application.repositories.base_repo import BaseRepository
 from app.domain.models import Order
 
 
-class OrderRepository:
+class OrderRepository(BaseRepository):
     def __init__(self, db: AsyncSession):
         self.db = db
 
-    async def create_order(self, order: Order) -> Order:
+    async def create(self, order: Order) -> Order:
         self.db.add(order)
         await self.db.commit()
         await self.db.refresh(order)
@@ -23,7 +24,7 @@ class OrderRepository:
 
         return order
 
-    async def get_order_by_id(self, order_id: int) -> Order:
+    async def get_by_id(self, order_id: int) -> Order:
         result = await self.db.execute(
             select(Order)
             .options(selectinload(Order.products))
@@ -32,17 +33,17 @@ class OrderRepository:
         order = result.scalar_one_or_none()
         return order
 
-    async def update_order(self, order: Order) -> Order:
+    async def update(self, order: Order) -> Order:
         await self.db.commit()
         await self.db.refresh(order)
         return order
 
-    async def soft_delete_order(self, order: Order) -> Order:
+    async def delete(self, order: Order) -> Order:
         await self.db.commit()
         await self.db.refresh(order)
         return order
 
-    async def get_orders(self, filters: list):
+    async def get_all(self, filters: list):
         query = select(Order).options(selectinload(Order.products)).where(*filters)
         result = await self.db.execute(query)
         return result.scalars().all()
