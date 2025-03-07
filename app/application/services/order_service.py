@@ -5,7 +5,6 @@ from app.domain.models import Order
 from app.domain.models.order import OrderStatus
 from app.infrastructure.redis_cache import (
     set_order_cache,
-    get_order_cache,
     delete_order_cache,
 )
 from app.presentation.mappers.order_mapper import map_order_to_cache_data
