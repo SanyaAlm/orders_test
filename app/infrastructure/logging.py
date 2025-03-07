@@ -1,5 +1,6 @@
 import logging.config
 
+# Настраиваем логирование с использованием словаря конфигурации: вывод в файл и консоль.
 logging.config.dictConfig({
     'version': 1,
     'disable_existing_loggers': False,

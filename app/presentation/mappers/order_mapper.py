@@ -9,6 +9,7 @@ from app.presentation.schemas.order_dto import (
 
 
 def map_order_to_dto(order: Order) -> OrderResponseDTO:
+    """Преобразует объект Order в OrderResponseDTO с вложенными продуктами."""
     products = [
         ProductDTO(name=p.name, price=p.price, quantity=p.quantity)
         for p in order.products
@@ -23,6 +24,7 @@ def map_order_to_dto(order: Order) -> OrderResponseDTO:
 
 
 def map_order_create_dto_to_order(dto: OrderCreateDTO) -> Order:
+    """Преобразует OrderCreateDTO в объект Order, создавая и добавляя вложенные продукты."""
     order = Order(
         customer_name=dto.customer_name,
         status=OrderStatus(dto.status),
@@ -34,6 +36,7 @@ def map_order_create_dto_to_order(dto: OrderCreateDTO) -> Order:
 
 
 def map_order_update_dto_to_order(order: Order, dto: OrderUpdateDTO) -> Order:
+    """Обновляет объект Order данными из OrderUpdateDTO, очищая и заменяя список продуктов."""
     order.customer_name = dto.customer_name
     order.status = OrderStatus(dto.status)
     order.products.clear()
@@ -44,6 +47,7 @@ def map_order_update_dto_to_order(order: Order, dto: OrderUpdateDTO) -> Order:
 
 
 def map_order_to_cache_data(order: Order) -> dict:
+    """Преобразует объект Order в словарь для кэширования с ключами order_id, customer_name, status, total_price, user_id и products."""
     return {
         "order_id": order.id,
         "customer_name": order.customer_name,

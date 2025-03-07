@@ -5,6 +5,8 @@ from app.domain.models import Base
 
 
 class Product(Base):
+    """Модель продукта, входящего в заказ, с полями для названия, цены, количества и ссылкой на заказ."""
+
     name: Mapped[str]
     price: Mapped[int]
     quantity: Mapped[int]

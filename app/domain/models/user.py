@@ -7,6 +7,8 @@ from ...infrastructure.db_connection import get_async_session
 
 
 class User(Base, SQLAlchemyBaseUserTable[int]):
+    """Модель пользователя, расширяющая SQLAlchemyBaseUserTable для интеграции с FastAPI-Users с идентификатором типа int."""
+
     pass
 
     @classmethod

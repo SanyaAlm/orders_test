@@ -16,6 +16,7 @@ class OrderService:
         self.repository = repository
 
     async def create_order(self, order: Order) -> Order:
+        """Создает заказ, вычисляет его общую стоимость, сохраняет в БД, кэширует и логирует создание."""
         order.total_price = sum(p.price * p.quantity for p in order.products)
         created_order = await self.repository.create(order)
         order_data = map_order_to_cache_data(created_order)
@@ -25,6 +26,7 @@ class OrderService:
         return created_order
 
     async def update_order(self, order: Order) -> Order:
+        """Обновляет заказ, пересчитывает его общую стоимость, сохраняет изменения, обновляет кэш и логирует обновление."""
         order.total_price = sum(p.price * p.quantity for p in order.products)
         updated_order = await self.repository.update(order)
         order_data = map_order_to_cache_data(updated_order)
@@ -34,6 +36,7 @@ class OrderService:
         return updated_order
 
     async def get_order_by_id(self, order_id: int) -> Optional[Order]:
+        """Получает заказ по идентификатору, кэширует его данные и возвращает заказ, если он найден."""
         order = await self.repository.get_by_id(order_id)
         if order:
             order_data = map_order_to_cache_data(order)
@@ -47,6 +50,7 @@ class OrderService:
         min_price: Optional[float] = None,
         max_price: Optional[float] = None,
     ):
+        """Возвращает список заказов, отфильтрованных по пользователю, статусу и диапазону цен."""
         enum_status = OrderStatus(status) if status else None
         filters = [Order.is_deleted == False]
         if user_id:
@@ -61,6 +65,7 @@ class OrderService:
         return await self.repository.get_all(filters)
 
     async def soft_delete_order(self, order: Order) -> Order:
+        """Мягко удаляет заказ, устанавливая флаг удаления, удаляет его из кэша и логирует событие."""
         order.is_deleted = True
         deleted_order = await self.repository.delete(order)
         await delete_order_cache(deleted_order.id)
