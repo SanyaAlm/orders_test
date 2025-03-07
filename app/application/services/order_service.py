@@ -22,14 +22,23 @@ class OrderService:
 
     async def get_orders(
         self,
+        user_id: int,
         status: Optional[str] = None,
         min_price: Optional[float] = None,
         max_price: Optional[float] = None,
     ) -> List[Order]:
         enum_status = OrderStatus(status) if status else None
-        return await self.repository.get_orders(
-            status=enum_status, min_price=min_price, max_price=max_price
-        )
+        filters = [Order.is_deleted == False]
+        if user_id:
+            filters.append(Order.user_id == user_id)
+        if status:
+            filters.append(Order.status == enum_status)
+        if min_price:
+            filters.append(Order.total_price >= min_price)
+        if max_price:
+            filters.append(Order.total_price <= max_price)
+
+        return await self.repository.get_orders(filters)
 
     async def soft_delete_order(self, order: Order) -> Order:
         return await self.repository.soft_delete_order(order)

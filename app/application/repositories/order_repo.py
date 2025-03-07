@@ -44,22 +44,7 @@ class OrderRepository:
         await self.db.refresh(order)
         return order
 
-    async def get_orders(
-        self,
-        status: OrderStatus = None,
-        min_price: float = None,
-        max_price: float = None,
-    ):
-        query = (
-            select(Order)
-            .options(selectinload(Order.products))
-            .where(Order.is_deleted == False)
-        )
-        if status:
-            query = query.where(Order.status == status)
-        if min_price:
-            query = query.where(Order.total_price >= min_price)
-        if max_price:
-            query = query.where(Order.total_price <= max_price)
+    async def get_orders(self, filters: list):
+        query = select(Order).options(selectinload(Order.products)).where(*filters)
         result = await self.db.execute(query)
         return result.scalars().all()
