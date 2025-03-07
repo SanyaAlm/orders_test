@@ -14,4 +14,18 @@ def _get_order_key(order_id: int):
 
 async def set_order_cache(order_id: int, data: dict, ttl: int = CACHE_TTL):
     key = _get_order_key(order_id)
-    return redis_client.set(key, json.dumps(data), ex=ttl)
+    result = await redis_client.set(key, json.dumps(data), ex=ttl)
+    return result
+
+
+async def get_order_cache(order_id: int):
+    key = _get_order_key(order_id)
+    value = await redis_client.get(key)
+    if value:
+        return value
+    return None
+
+
+async def delete_order_cache(order_id: int):
+    key = _get_order_key(order_id)
+    await redis_client.delete(key)
