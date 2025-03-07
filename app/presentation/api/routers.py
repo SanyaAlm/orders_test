@@ -3,7 +3,7 @@ from fastapi.security import HTTPBearer
 
 from app.application.users.transport import fastapi_users, auth_backend
 from app.presentation.api.endpoints import order
-from app.presentation.schemas.user import UserRead, UserCreate
+from app.presentation.schemas.user_dto import UserRead, UserCreate
 
 http_bearer: HTTPBearer = HTTPBearer(auto_error=False)
 

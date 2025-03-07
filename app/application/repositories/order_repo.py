@@ -3,7 +3,6 @@ from sqlalchemy.future import select
 from sqlalchemy.orm import selectinload
 
 from app.domain.models import Order
-from app.domain.models.order import OrderStatus
 
 
 class OrderRepository:

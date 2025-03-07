@@ -1,11 +1,7 @@
 from pydantic import BaseModel
 from typing import List
 
-
-class ProductDTO(BaseModel):
-    name: str
-    price: int
-    quantity: int
+from .product_dto import ProductDTO
 
 
 class OrderCreateDTO(BaseModel):

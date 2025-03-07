@@ -1,6 +1,6 @@
 from app.domain.models import Order, Product
 from app.domain.models.order import OrderStatus
-from app.presentation.schemas.order import (
+from app.presentation.schemas.order_dto import (
     OrderResponseDTO,
     ProductDTO,
     OrderCreateDTO,
@@ -25,7 +25,7 @@ def map_order_to_dto(order: Order) -> OrderResponseDTO:
 def map_order_create_dto_to_order(dto: OrderCreateDTO) -> Order:
     order = Order(
         customer_name=dto.customer_name,
-        status=OrderStatus(dto.status),  # Преобразуем строку в Enum
+        status=OrderStatus(dto.status),
     )
     for prod in dto.products:
         product = Product(name=prod.name, price=prod.price, quantity=prod.quantity)
