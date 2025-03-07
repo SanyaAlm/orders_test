@@ -15,6 +15,7 @@ uvicorn = "^0.34.0"
 asyncpg = "^0.30.0"
 python-dotenv = "^1.0.1"
 fastapi-users = {extras = ["sqlalchemy"], version = "^14.0.1"}
+redis = "^5.2.1"
 
 
 [tool.poetry.group.dev.dependencies]
