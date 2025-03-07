@@ -39,7 +39,6 @@ class OrderRepository:
         return order
 
     async def soft_delete_order(self, order: Order) -> Order:
-        order.is_deleted = True
         await self.db.commit()
         await self.db.refresh(order)
         return order

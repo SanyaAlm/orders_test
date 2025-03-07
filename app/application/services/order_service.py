@@ -3,6 +3,12 @@ from typing import Optional, List
 from app.application.repositories.order_repo import OrderRepository
 from app.domain.models import Order
 from app.domain.models.order import OrderStatus
+from app.infrastructure.redis_cache import (
+    set_order_cache,
+    get_order_cache,
+    delete_order_cache,
+)
+from app.presentation.mappers.order_mapper import map_order_to_cache_data
 
 
 class OrderService:
@@ -11,14 +17,26 @@ class OrderService:
 
     async def create_order(self, order: Order) -> Order:
         order.total_price = sum(p.price * p.quantity for p in order.products)
-        return await self.repository.create_order(order)
+        created_order = await self.repository.create_order(order)
+        order_data = map_order_to_cache_data(created_order)
+        await set_order_cache(created_order.id, order_data)
+
+        return created_order
 
     async def update_order(self, order: Order) -> Order:
         order.total_price = sum(p.price * p.quantity for p in order.products)
-        return await self.repository.update_order(order)
+        updated_order = await self.repository.update_order(order)
+        order_data = map_order_to_cache_data(updated_order)
+        await set_order_cache(updated_order.id, order_data)
+
+        return updated_order
 
     async def get_order_by_id(self, order_id: int) -> Optional[Order]:
-        return await self.repository.get_order_by_id(order_id)
+        order = await self.repository.get_order_by_id(order_id)
+        if order:
+            order_data = map_order_to_cache_data(order)
+            await set_order_cache(order.id, order_data)
+        return order
 
     async def get_orders(
         self,
@@ -41,4 +59,8 @@ class OrderService:
         return await self.repository.get_orders(filters)
 
     async def soft_delete_order(self, order: Order) -> Order:
-        return await self.repository.soft_delete_order(order)
+        order.is_deleted = True
+        deleted_order = await self.repository.soft_delete_order(order)
+        await delete_order_cache(deleted_order.id)
+
+        return deleted_order
