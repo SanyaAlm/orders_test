@@ -3,6 +3,7 @@ from typing import Optional, List
 from app.application.repositories.order_repo import OrderRepository
 from app.domain.models import Order
 from app.domain.models.order import OrderStatus
+from app.infrastructure.logging import logger
 from app.infrastructure.redis_cache import (
     set_order_cache,
     delete_order_cache,
@@ -18,6 +19,7 @@ class OrderService:
         order.total_price = sum(p.price * p.quantity for p in order.products)
         created_order = await self.repository.create_order(order)
         order_data = map_order_to_cache_data(created_order)
+        logger.info(f"User {created_order.user_id} created order {created_order.id}")
         await set_order_cache(created_order.id, order_data)
 
         return created_order
@@ -26,6 +28,7 @@ class OrderService:
         order.total_price = sum(p.price * p.quantity for p in order.products)
         updated_order = await self.repository.update_order(order)
         order_data = map_order_to_cache_data(updated_order)
+        logger.info(f"User {updated_order.user_id} updated order {updated_order.id}")
         await set_order_cache(updated_order.id, order_data)
 
         return updated_order
@@ -61,5 +64,6 @@ class OrderService:
         order.is_deleted = True
         deleted_order = await self.repository.soft_delete_order(order)
         await delete_order_cache(deleted_order.id)
+        logger.info(f"User {deleted_order.user_id} deleted order {deleted_order.id}")
 
         return deleted_order
