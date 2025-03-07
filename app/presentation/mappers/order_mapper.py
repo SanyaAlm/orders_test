@@ -41,3 +41,17 @@ def map_order_update_dto_to_order(order: Order, dto: OrderUpdateDTO) -> Order:
         product = Product(name=prod.name, price=prod.price, quantity=prod.quantity)
         order.products.append(product)
     return order
+
+
+def map_order_to_cache_data(order: Order) -> dict:
+    return {
+        "order_id": order.id,
+        "customer_name": order.customer_name,
+        "status": order.status.value,
+        "total_price": order.total_price,
+        "user_id": order.user_id,
+        "products": [
+            {"name": p.name, "price": p.price, "quantity": p.quantity}
+            for p in order.products
+        ],
+    }
