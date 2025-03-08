@@ -1,8 +1,7 @@
 ## Установка
 
 ### 1. Клонируйте репозиторий
-```
-bash
+```bash
 git clone git@github.com:SanyaAlm/orders_test.git && cd orders_test
 ```
 
@@ -23,8 +22,7 @@ REDIS_PORT=6379
 ```
 Для установки зависимостей используйте [Poetry](https://python-poetry.org/). Выполните следующую команду:
 
-```
-bash
+```bash
 poetry install
 ```
 
