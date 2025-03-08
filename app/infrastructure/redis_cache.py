@@ -2,7 +2,7 @@ import json
 
 from redis.asyncio import Redis
 
-REDIS_URL = "redis://localhost:6379"
+REDIS_URL = "redis://redis:6379"
 redis_client: Redis = Redis.from_url(REDIS_URL, decode_responses=True)
 
 CACHE_TTL = 300
