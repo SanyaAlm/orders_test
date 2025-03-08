@@ -1,6 +1,5 @@
 import logging.config
 
-from app.infrastructure import settings
 
 # Настраиваем логирование с использованием словаря конфигурации: вывод в файл и консоль.
 

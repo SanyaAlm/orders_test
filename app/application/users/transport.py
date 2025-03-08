@@ -4,7 +4,7 @@ from fastapi_users.authentication import (
     AuthenticationBackend,
 )
 
-from app.infrastructure import settings
+from app.core import settings
 
 bearer_transport = BearerTransport(tokenUrl="auth/login")
 

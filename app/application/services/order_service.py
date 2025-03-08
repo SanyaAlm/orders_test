@@ -3,7 +3,7 @@ from typing import Optional
 from app.application.repositories.order_repo import OrderRepository
 from app.domain.models import Order
 from app.domain.models.order import OrderStatus
-from app.infrastructure.logging import logger
+from app.core.logging import logger
 from app.infrastructure.redis_cache import (
     set_order_cache,
     delete_order_cache,
