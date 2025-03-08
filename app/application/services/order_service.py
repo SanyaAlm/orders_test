@@ -33,7 +33,6 @@ class OrderService:
         """Обновляет заказ, пересчитывает его общую стоимость, сохраняет изменения, обновляет кэш и логирует обновление."""
         order.total_price = sum(p.price * p.quantity for p in order.products)
         updated_order = await self.repository.update(order)
-
         order_data = map_order_to_cache_data(updated_order)
         logger.info(f"User {updated_order.user_id} updated order {updated_order.id}")
         await set_order_cache(updated_order.id, order_data)

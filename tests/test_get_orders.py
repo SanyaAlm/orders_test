@@ -2,7 +2,7 @@ from app.domain.models import Order
 from app.domain.models.order import OrderStatus
 
 
-async def test_get_all_orders(login_user, get_test_session):
+async def test_get_all_orders(login_admin_user, get_test_session):
     orders = [
         Order(
             customer_name="John", total_price=100, status=OrderStatus.PENDING, user_id=1
@@ -24,7 +24,7 @@ async def test_get_all_orders(login_user, get_test_session):
         session.add_all(orders)
         await session.commit()
 
-    async_client, user = login_user
+    async_client, user = login_admin_user
     response = await async_client.get("/orders/all")
     assert response.status_code == 200
     data = response.json()
@@ -34,7 +34,7 @@ async def test_get_all_orders(login_user, get_test_session):
     assert data[2]["status"] == "cancelled"
 
 
-async def test_get_orders_by_status(login_user, get_test_session):
+async def test_get_orders_by_status(login_admin_user, get_test_session):
     orders = [
         Order(
             customer_name="John Doe",
@@ -60,7 +60,7 @@ async def test_get_orders_by_status(login_user, get_test_session):
         session.add_all(orders)
         await session.commit()
 
-    async_client, user = login_user
+    async_client, user = login_admin_user
     response = await async_client.get("/orders/all?status=confirmed")
 
     assert response.status_code == 200
