@@ -6,6 +6,7 @@ from app.domain.models import User
 
 
 class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
+    """Менеджер пользователей с поддержкой регистрации, сброса пароля и верификации."""
     reset_password_token_secret = settings.SECRET_KEY
     verification_token_secret = settings.SECRET_KEY
 
