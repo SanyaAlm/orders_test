@@ -1,14 +1,18 @@
+import asyncio
 from typing import AsyncGenerator, Any, Generator
 
+import pytest
 import pytest_asyncio
 from fakeredis.aioredis import FakeRedis
 from httpx import AsyncClient, ASGITransport
 from sqlalchemy import select, Result
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
 
-from app.domain.models import Base, User
+from app.domain.models import Base, User, Order
+from app.domain.models.order import OrderStatus
 
 from app.infrastructure.db_connection import get_async_session
+from app.infrastructure.logging import logger
 from app.infrastructure.redis_cache import redis_client
 from app.main import app
 
@@ -57,6 +61,7 @@ async def get_test_session() -> Generator[AsyncSession, Any, None]:
     """Возвращает сессию базы данных для тестов."""
     async for session in override_get_async_session():
         yield session
+        await session.rollback()
 
 
 @pytest_asyncio.fixture
@@ -115,6 +120,16 @@ async def login_admin_user(async_client: AsyncClient, test_user):
     return async_client, test_user
 
 
+@pytest.fixture(scope="session")
+def event_loop():
+    try:
+        loop = asyncio.get_running_loop()
+    except RuntimeError:
+        loop = asyncio.new_event_loop()
+    yield loop
+    loop.close()
+
+
 @pytest_asyncio.fixture
 async def test_regular_user(async_client: AsyncClient, get_test_session) -> User:
     """Создает тестового обычного пользователя."""
@@ -150,3 +165,40 @@ async def login_regular_user(async_client: AsyncClient, test_regular_user):
     async_client.headers.update({"Authorization": f"Bearer {token}"})
 
     return async_client, test_regular_user
+
+
+@pytest_asyncio.fixture
+async def create_orders(get_test_session):
+    """Создает заказы для тестов."""
+    orders = [
+        Order(
+            customer_name="John Doe",
+            total_price=100,
+            status=OrderStatus.PENDING,
+            user_id=1,
+        ),
+        Order(
+            customer_name="Jane33",
+            total_price=200,
+            status=OrderStatus.CONFIRMED,
+            user_id=1,
+        ),
+        Order(
+            customer_name="Bob",
+            total_price=300,
+            status=OrderStatus.CANCELLED,
+            user_id=1,
+        ),
+        Order(
+            customer_name="Bob",
+            total_price=300,
+            status=OrderStatus.CANCELLED,
+            user_id=2,
+        ),
+    ]
+
+    async with get_test_session as session:
+        session.add_all(orders)
+        await session.commit()
+
+    return orders

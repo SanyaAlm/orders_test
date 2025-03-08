@@ -1,32 +1,11 @@
+import pytest
+
 from app.domain.models import Order
 from app.domain.models.order import OrderStatus
 
 
-async def test_get_order_by_id(get_test_session, login_admin_user):
-    orders = [
-        Order(
-            customer_name="John1 Doe",
-            total_price=101,
-            status=OrderStatus.PENDING,
-            user_id=1,
-        ),
-        Order(
-            customer_name="Jane33",
-            total_price=200,
-            status=OrderStatus.CONFIRMED,
-            user_id=1,
-        ),
-        Order(
-            customer_name="Bob",
-            total_price=300,
-            status=OrderStatus.CANCELLED,
-            user_id=1,
-        ),
-    ]
-
-    async with get_test_session as session:
-        session.add_all(orders)
-        await session.commit()
+@pytest.mark.asyncio
+async def test_update_order_by_id(get_test_session, login_admin_user, create_orders):
 
     async_client, user = login_admin_user
     order_id = 1
@@ -47,6 +26,7 @@ async def test_get_order_by_id(get_test_session, login_admin_user):
     assert updated_order["status"] == update_data["status"]
 
 
+@pytest.mark.asyncio
 async def test_update_order_not_found(get_test_session, login_admin_user):
     async_client, user = login_admin_user
 
@@ -63,6 +43,7 @@ async def test_update_order_not_found(get_test_session, login_admin_user):
     assert response.json() == {"detail": "Order not found"}
 
 
+@pytest.mark.asyncio
 async def test_update_order_invalid_data(get_test_session, login_admin_user):
     # Создаем начальный заказ
     order = Order(

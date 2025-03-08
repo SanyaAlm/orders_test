@@ -1,6 +1,7 @@
 import pytest
 
 
+@pytest.mark.asyncio
 async def test_create_order(login_admin_user):
     """Тест на создание нового заказа."""
     order_data = {
@@ -22,6 +23,7 @@ async def test_create_order(login_admin_user):
     assert len(data["products"]) == 2
 
 
+@pytest.mark.asyncio
 async def test_create_wrong_order(login_admin_user):
     """Тест на создание нового заказа с ошибкой"""
     order_data = {
