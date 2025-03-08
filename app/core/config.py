@@ -12,6 +12,8 @@ class Settings(BaseSettings):
     POSTGRES_DB: str
 
     SECRET_KEY: str
+    REDIS_HOST:str
+    REDIS_PORT: str
 
     class Config:
         case_sensitive = True

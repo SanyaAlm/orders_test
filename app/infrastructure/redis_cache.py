@@ -2,7 +2,9 @@ import json
 
 from redis.asyncio import Redis
 
-REDIS_URL = "redis://redis:6379"
+from app.core import settings
+
+REDIS_URL = f"redis://{settings.REDIS_HOST}:{settings.REDIS_PORT}"
 redis_client: Redis = Redis.from_url(REDIS_URL, decode_responses=True)
 
 CACHE_TTL = 300
