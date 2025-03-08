@@ -34,13 +34,15 @@ class OrderRepository(BaseRepository):
         return order
 
     async def update(self, order: Order) -> Order:
+        merged_order = await self.db.merge(order)
         await self.db.commit()
-        await self.db.refresh(order)
+        await self.db.refresh(merged_order)
         return order
 
     async def delete(self, order: Order) -> Order:
+        merged_order = await self.db.merge(order)
         await self.db.commit()
-        await self.db.refresh(order)
+        await self.db.refresh(merged_order)
         return order
 
     async def get_all(self, filters: list):

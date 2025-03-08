@@ -1,3 +1,5 @@
+import json
+
 from app.domain.models import Order, Product
 from app.domain.models.order import OrderStatus
 from app.presentation.schemas.order_dto import (
@@ -59,3 +61,15 @@ def map_order_to_cache_data(order: Order) -> dict:
             for p in order.products
         ],
     }
+
+
+def map_cache_to_order(data: dict):
+    data = json.loads(data)
+    return Order(
+        id=int(data["order_id"]),
+        customer_name=data["customer_name"],
+        status=OrderStatus[data["status"].upper()],
+        total_price=data["total_price"],
+        user_id=data["user_id"],
+        products=[Product(**prod) for prod in data["products"]],
+    )

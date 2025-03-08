@@ -7,8 +7,12 @@ from app.infrastructure.logging import logger
 from app.infrastructure.redis_cache import (
     set_order_cache,
     delete_order_cache,
+    get_order_cache,
 )
-from app.presentation.mappers.order_mapper import map_order_to_cache_data
+from app.presentation.mappers.order_mapper import (
+    map_order_to_cache_data,
+    map_cache_to_order,
+)
 
 
 class OrderService:
@@ -29,6 +33,7 @@ class OrderService:
         """Обновляет заказ, пересчитывает его общую стоимость, сохраняет изменения, обновляет кэш и логирует обновление."""
         order.total_price = sum(p.price * p.quantity for p in order.products)
         updated_order = await self.repository.update(order)
+
         order_data = map_order_to_cache_data(updated_order)
         logger.info(f"User {updated_order.user_id} updated order {updated_order.id}")
         await set_order_cache(updated_order.id, order_data)
@@ -37,6 +42,10 @@ class OrderService:
 
     async def get_order_by_id(self, order_id: int) -> Optional[Order]:
         """Получает заказ по идентификатору, кэширует его данные и возвращает заказ, если он найден."""
+        cached_data = await get_order_cache(order_id)
+        if cached_data:
+            # Если данные найдены в кэше, мапим их в объект заказа
+            return map_cache_to_order(cached_data)
         order = await self.repository.get_by_id(order_id)
         if order:
             order_data = map_order_to_cache_data(order)

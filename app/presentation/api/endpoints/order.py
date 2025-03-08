@@ -2,6 +2,7 @@ from typing import List, Optional
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
+from starlette import status
 
 from app.application.repositories.order_repo import OrderRepository
 from app.application.services.order_service import OrderService
@@ -34,6 +35,7 @@ async def get_order_service(
     response_model=List[OrderResponseDTO,],
     summary="Эндпоинт возвращает список заявок",
     description="Обычный пользователь видит только свои заявки, администратор — все заявки.",
+    status_code=status.HTTP_200_OK,
 )
 async def get_orders(
     status: Optional[str] = None,
@@ -64,6 +66,7 @@ async def get_orders(
     response_model=OrderResponseDTO,
     summary="Эндроинт возвращает заявку по id",
     description="Возвращает информацию о заявке по заданному идентификатору. Доступно только владельцу заявки или администратору.",
+    status_code=status.HTTP_200_OK,
 )
 async def get_order(
     order_id: int,
@@ -92,6 +95,7 @@ async def get_order(
     response_model=OrderResponseDTO,
     summary="Эндпоинт для создания заявки",
     description="Эндпоинт для создания новой заявки. При создании заявка привязывается к текущему пользователю.",
+    status_code=status.HTTP_201_CREATED,
 )
 async def create_order(
     order_dto: OrderCreateDTO,
@@ -104,7 +108,10 @@ async def create_order(
     - **user**: Текущий авторизованный пользователь.
     Созданная заявка будет привязана к идентификатору текущего пользователя.
     """
-    order = map_order_create_dto_to_order(order_dto)
+    try:
+        order = map_order_create_dto_to_order(order_dto)
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
     order.user_id = user.id
     created_order = await service.create_order(order)
     return map_order_to_dto(created_order)
@@ -115,6 +122,7 @@ async def create_order(
     response_model=OrderResponseDTO,
     summary="Эндпоинт для обновления заявки по id",
     description="Обновление данных существующей заявки. Доступно только владельцу заявки или администратору.",
+    status_code=status.HTTP_200_OK,
 )
 async def update_order(
     order_id: int,
@@ -138,8 +146,10 @@ async def update_order(
 
     if not user.is_superuser and order.user_id != user.id:
         raise HTTPException(status_code=403, detail="Forbidden")
-
-    order = map_order_update_dto_to_order(order, order_dto)
+    try:
+        order = map_order_update_dto_to_order(order, order_dto)
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
     updated_order = await service.update_order(order)
 
     return map_order_to_dto(updated_order)
@@ -147,9 +157,9 @@ async def update_order(
 
 @router.delete(
     "/delete/{order_id}",
-    response_model=OrderResponseDTO,
     summary="Удалить заявку",
     description="Мягкое удаление заявки. Доступно только владельцу заявки или администратору.",
+    status_code=status.HTTP_204_NO_CONTENT,
 )
 async def delete_order(
     order_id: int,
@@ -174,6 +184,4 @@ async def delete_order(
     if not user.is_superuser and order.user_id != user.id:
         raise HTTPException(status_code=403, detail="Forbidden")
 
-    deleted_order = await service.soft_delete_order(order)
-
-    return map_order_to_dto(deleted_order)
+    await service.soft_delete_order(order)
