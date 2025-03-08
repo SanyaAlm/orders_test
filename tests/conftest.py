@@ -99,7 +99,7 @@ async def test_user(async_client: AsyncClient, get_test_session) -> User:
 
 
 @pytest_asyncio.fixture
-async def login_user(async_client: AsyncClient, test_user):
+async def login_admin_user(async_client: AsyncClient, test_user):
     """Логинит тестового пользователя и возвращает клиент с обновленными заголовками для авторизации."""
     client_data = {
         "username": test_user.email,
@@ -113,3 +113,40 @@ async def login_user(async_client: AsyncClient, test_user):
     async_client.headers.update({"Authorization": f"Bearer {token}"})
 
     return async_client, test_user
+
+
+@pytest_asyncio.fixture
+async def test_regular_user(async_client: AsyncClient, get_test_session) -> User:
+    """Создает тестового обычного пользователя."""
+    client_data = {
+        "email": "regular_user@gmail.com",
+        "password": "123",
+        "is_superuser": False,
+        "is_active": True,
+    }
+    response = await async_client.post("/auth/register", json=client_data)
+    print(response.json())
+    assert response.status_code == 201
+    async with get_test_session as session:
+        result: Result = await session.execute(
+            select(User).filter_by(id=response.json()["id"])
+        )
+        user: User = result.scalars().first()
+    return user
+
+
+@pytest_asyncio.fixture
+async def login_regular_user(async_client: AsyncClient, test_regular_user):
+    """Логинит обычного пользователя и возвращает клиент с обновленными заголовками для авторизации."""
+    client_data = {
+        "username": test_regular_user.email,
+        "password": "123",
+        "grant_type": "password",
+    }
+    response = await async_client.post("/auth/login", data=client_data)
+
+    assert response.status_code == 200
+    token = response.json()["access_token"]
+    async_client.headers.update({"Authorization": f"Bearer {token}"})
+
+    return async_client, test_regular_user
