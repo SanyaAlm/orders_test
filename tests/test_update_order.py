@@ -6,7 +6,7 @@ from app.domain.models.order import OrderStatus
 
 @pytest.mark.asyncio
 async def test_update_order_by_id(get_test_session, login_admin_user, create_orders):
-
+    """Тест обновление заказа юзера"""
     async_client, user = login_admin_user
     order_id = 1
     update_data = {
@@ -28,6 +28,8 @@ async def test_update_order_by_id(get_test_session, login_admin_user, create_ord
 
 @pytest.mark.asyncio
 async def test_update_order_not_found(get_test_session, login_admin_user):
+    """Тест обновление заказа юзера с ошибкой"""
+
     async_client, user = login_admin_user
 
     update_data = {
@@ -36,8 +38,8 @@ async def test_update_order_not_found(get_test_session, login_admin_user):
         "status": "pending",
         "products": [{"name": "string", "price": 75, "quantity": 2}],
     }
-
-    response = await async_client.put("/orders/update/9999", json=update_data)
+    order_id = 9999
+    response = await async_client.put(f"/orders/update/{order_id}", json=update_data)
 
     assert response.status_code == 404
     assert response.json() == {"detail": "Order not found"}
@@ -45,7 +47,8 @@ async def test_update_order_not_found(get_test_session, login_admin_user):
 
 @pytest.mark.asyncio
 async def test_update_order_invalid_data(get_test_session, login_admin_user):
-    # Создаем начальный заказ
+    """Тест обновление заказа юзера с ошибкой"""
+
     order = Order(
         customer_name="John1 Doe",
         total_price=101,
@@ -67,6 +70,5 @@ async def test_update_order_invalid_data(get_test_session, login_admin_user):
     }
 
     response = await async_client.put(f"/orders/update/{order.id}", json=update_data)
-
     assert response.status_code == 400
     assert "detail" in response.json()

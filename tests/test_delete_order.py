@@ -3,7 +3,7 @@ import pytest
 
 @pytest.mark.asyncio
 async def test_delete_order(get_test_session, login_admin_user, create_orders):
-
+    """Тест на удаление заказа."""
     async_client, user = login_admin_user
     order_id = 1
     response = await async_client.delete(f"/orders/delete/{order_id}")
@@ -18,6 +18,7 @@ async def test_delete_order(get_test_session, login_admin_user, create_orders):
 
 @pytest.mark.asyncio
 async def test_delete_non_existent_order(get_test_session, login_admin_user):
+    """Тест на удаление заказа с ошибкой."""
     non_existent_order_id = 999
     async_client, user = login_admin_user
     response = await async_client.delete(f"/orders/delete/{non_existent_order_id}")
