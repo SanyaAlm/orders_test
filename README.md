@@ -31,5 +31,15 @@ poetry install
 ```bash
 docker compose up -d --build
 ```
-### 4. Доступ к API
+### 4. Запуск тестов
+Для запуска тестов проваливаемся в докер контейнер с помощью команды:
+```bash
+docker exec -it fastapi_app /bin/bash
+```
+После этого можем запустить тесты командой:
+```bash
+pytest -v
+```
+
+### 5. Доступ к API
 API эндпоинты будут доступны по адресу: (http://localhost:8000/docs)
