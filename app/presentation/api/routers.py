@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends
 from fastapi.security import HTTPBearer
 
-from app.application.users.fastapi_users import fastapi_users
 from app.application.users.transport import auth_backend
+from app.core.security import fastapi_users
 from app.presentation.api.endpoints import order
 from app.presentation.schemas.user_dto import UserRead, UserCreate
 

@@ -6,7 +6,7 @@ from starlette import status
 
 from app.application.repositories.order_repo import OrderRepository
 from app.application.services.order_service import OrderService
-from app.application.users.fastapi_users import current_user
+from app.core.security import current_user
 from app.domain.models import User
 from app.infrastructure.db_connection import get_async_session
 from app.presentation.mappers.order_mapper import (
