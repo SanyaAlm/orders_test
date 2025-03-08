@@ -2,7 +2,8 @@
 
 ### 1. Клонируйте репозиторий
 ```bash
-git clone git@github.com:SanyaAlm/orders_test.git && cd orders_test
+git clone git@github.com:SanyaAlm/orders_test.git
+cd orders_test
 ```
 
 ### 2. Установка зависимостей:
@@ -25,4 +26,10 @@ REDIS_PORT=6379
 ```bash
 poetry install
 ```
-
+### 3. Запуск Docker контейнеров:
+Для поднятия Docker контейнеров выполните команду:
+```bash
+docker compose up -d --build
+```
+### 4. Доступ к API
+API эндпоинты будут доступны по адресу: (http://localhost:8000/docs)
