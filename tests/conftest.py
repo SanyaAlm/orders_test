@@ -1,5 +1,8 @@
 import asyncio
+import logging
+from io import StringIO
 from typing import AsyncGenerator, Any, Generator
+from unittest.mock import patch
 
 import pytest
 import pytest_asyncio
@@ -12,7 +15,6 @@ from app.domain.models import Base, User, Order
 from app.domain.models.order import OrderStatus
 
 from app.infrastructure.db_connection import get_async_session
-from app.infrastructure.logging import logger
 from app.infrastructure.redis_cache import redis_client
 from app.main import app
 

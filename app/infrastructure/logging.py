@@ -1,6 +1,11 @@
 import logging.config
 
+from app.infrastructure import settings
+
 # Настраиваем логирование с использованием словаря конфигурации: вывод в файл и консоль.
+
+log_file='app/orders.log'
+
 logging.config.dictConfig({
     'version': 1,
     'disable_existing_loggers': False,
@@ -13,7 +18,7 @@ logging.config.dictConfig({
          'file': {
               'level': 'INFO',
               'class': 'logging.FileHandler',
-              'filename': 'orders.log',
+              'filename': log_file,
               'formatter': 'default',
          },
          'console': {
