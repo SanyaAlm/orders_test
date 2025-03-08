@@ -1,4 +1,4 @@
-from typing import Optional, List, Any, Coroutine
+from typing import Optional
 
 from app.application.repositories.order_repo import OrderRepository
 from app.domain.models import Order

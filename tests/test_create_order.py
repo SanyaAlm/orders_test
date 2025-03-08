@@ -1,3 +1,6 @@
+import pytest
+
+
 async def test_create_order(login_admin_user):
     """Тест на создание нового заказа."""
     order_data = {
